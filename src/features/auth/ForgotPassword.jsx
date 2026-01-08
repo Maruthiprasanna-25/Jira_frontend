@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { authService } from '../../services/api';
 import kietLogo from '../../assets/kiet-logo.png';
+import { formatError } from '../../utils/renderUtils';
 import './Auth.css';
 
 const ForgotPassword = () => {
@@ -35,7 +36,7 @@ const ForgotPassword = () => {
                     <p className="auth-subtitle">Enter your email address and we'll send you a link to reset your password.</p>
                 </div>
 
-                {error && <div className="auth-error-toast">{error}</div>}
+                {error && <div className="jira-reset-error">{formatError(error)}</div>}
                 {message && <div className="auth-success-toast">{message}</div>}
 
                 <form onSubmit={handleSubmit} className="auth-form">

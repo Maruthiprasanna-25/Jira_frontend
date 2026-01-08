@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import kietLogo from '../../assets/kiet-logo.png';
+import { formatError } from '../../utils/renderUtils';
 import './Auth.css';
 
 const Login = () => {
@@ -52,7 +53,7 @@ const Login = () => {
                 </div>
 
                 {message && <div className="auth-success-toast">{message}</div>}
-                {error && <div className="auth-error-toast">{error}</div>}
+                {error && <div className="auth-error-toast">{formatError(error)}</div>}
 
                 <form onSubmit={handleSubmit} className="auth-form">
                     <div className="auth-input-group">

@@ -64,6 +64,7 @@ export const endpoints = {
         users: '/auth/users',
         forgotPassword: '/auth/forgot-password',
         resetPassword: '/auth/reset-password',
+        switchMode: '/auth/switch-mode',
     },
 
     projects: '/projects',
@@ -85,6 +86,58 @@ export const endpoints = {
     teams: {
         base: '/teams',
         project: (projectId) => `/teams/project/${projectId}`,
+    },
+    modeSwitch: {
+        request: '/mode-switch/request',
+        requests: '/mode-switch/requests',
+        approve: (id) => `/mode-switch/approve/${id}`,
+        reject: (id) => `/mode-switch/reject/${id}`,
+    },
+    stats: {
+        summary: '/stats/master-admin/summary',
+        history: '/stats/master-admin/mode-switch-history',
+    },
+};
+
+// --------------------------------------------------
+// STATS SERVICE
+// --------------------------------------------------
+export const statsService = {
+    getAdminSummary: async (params) => {
+        const response = await api.get(endpoints.stats.summary, { params });
+        return response.data;
+    },
+    getModeSwitchHistory: async () => {
+        const response = await api.get(endpoints.stats.history);
+        return response.data;
+    },
+};
+
+// --------------------------------------------------
+// MODE SWITCH SERVICE
+// --------------------------------------------------
+export const modeSwitchService = {
+    requestSwitch: async (requestedMode, reason) => {
+        const response = await api.post(endpoints.modeSwitch.request, {
+            requested_mode: requestedMode,
+            reason: reason,
+        });
+        return response.data;
+    },
+
+    getPendingRequests: async () => {
+        const response = await api.get(endpoints.modeSwitch.requests);
+        return response.data;
+    },
+
+    approveRequest: async (requestId) => {
+        const response = await api.post(endpoints.modeSwitch.approve(requestId));
+        return response.data;
+    },
+
+    rejectRequest: async (requestId) => {
+        const response = await api.post(endpoints.modeSwitch.reject(requestId));
+        return response.data;
     },
 };
 
@@ -110,12 +163,9 @@ export const notificationService = {
 // --------------------------------------------------
 export const authService = {
     login: async (email, password) => {
-        const response = await api.post(endpoints.auth.login, null, {
-            params: {
-                username: email,
-                email: email,
-                password: password,
-            },
+        const response = await api.post(endpoints.auth.login, {
+            email,
+            password,
         });
 
         if (response.data.access_token) {
@@ -125,9 +175,12 @@ export const authService = {
         return response.data;
     },
 
-    signup: async (username, email, password, role = 'MEMBER') => {
-        const response = await api.post(endpoints.auth.signup, null, {
-            params: { username, email, password, role },
+    signup: async (username, email, password, role = 'DEVELOPER') => {
+        const response = await api.post(endpoints.auth.signup, {
+            username,
+            email,
+            password,
+            role,
         });
         return response.data;
     },
@@ -184,6 +237,15 @@ export const authService = {
         const response = await api.post(
             `${endpoints.auth.forgotPassword}?email=${encodeURIComponent(email)}`
         );
+        return response.data;
+    },
+
+    switchMode: async (mode) => {
+        const formData = new FormData();
+        formData.append('mode', mode);
+        const response = await api.post(endpoints.auth.switchMode, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+        });
         return response.data;
     },
 };

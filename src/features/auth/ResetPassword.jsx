@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { authService } from '../../services/api';
+import { formatError } from '../../utils/renderUtils';
 import './ResetPassword.css';
 
 import resetIllustration from '../../assets/reset_illustration.png';
@@ -72,7 +73,7 @@ const ResetPassword = () => {
                         <h1>Reset Your Password</h1>
                     </div>
 
-                    {error && <div className="jira-reset-error">{error}</div>}
+                    {error && <div className="jira-reset-error">{formatError(error)}</div>}
                     {message && <div className="jira-reset-success">{message}</div>}
 
                     <form onSubmit={handleSubmit} className="jira-reset-form">

@@ -2,12 +2,15 @@ import React, { useState, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { authService } from '../../services/api';
 import { Camera, Edit2, Save, X, Loader2 } from 'lucide-react';
+import { formatError } from '../../utils/renderUtils';
+import ModeSwitchRequestModal from './ModeSwitchRequestModal';
 import './ProfilePage.css';
 
 const ProfilePage = () => {
-    const { user, checkAuth } = useAuth();
+    const { user, checkAuth, switchMode } = useAuth();
     const [isEditing, setIsEditing] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [switchingMode, setSwitchingMode] = useState(false);
     const [formData, setFormData] = useState({
         username: user?.username || '',
         email: user?.email || '',
@@ -71,6 +74,19 @@ const ProfilePage = () => {
         }
     };
 
+    const [showRequestModal, setShowRequestModal] = useState(null);
+
+    const handleSwitchMode = (mode) => {
+        if (user.view_mode === mode) return;
+        setShowRequestModal(mode);
+    };
+
+    const onRequestSuccess = () => {
+        setShowRequestModal(null);
+        setSuccess('Your request has been sent to the Master Admin for approval.');
+        setTimeout(() => setSuccess(''), 5000);
+    };
+
     return (
         <div className="profile-container">
             <div className="profile-card">
@@ -97,7 +113,14 @@ const ProfilePage = () => {
 
                     <div className="profile-title-area">
                         <div className="profile-name-row">
-                            <h1>{user.username}</h1>
+                            <div className="name-with-banner">
+                                <h1>{user.username}</h1>
+                                {user.is_master_admin && (
+                                    <span className="master-admin-badge" title="Full System Access">
+                                        🛡️ Master Administrator
+                                    </span>
+                                )}
+                            </div>
                             {!isEditing && (
                                 <button className="edit-profile-btn" onClick={() => setIsEditing(true)}>
                                     <Edit2 size={16} /> Edit Profile
@@ -108,7 +131,17 @@ const ProfilePage = () => {
                     </div>
                 </div>
 
-                {error && <div className="profile-alert error">{error}</div>}
+                {user.is_master_admin && (
+                    <div className="master-admin-banner">
+                        <div className="banner-icon">🛡️</div>
+                        <div className="banner-content">
+                            <h3>Master Administrator</h3>
+                            <p>You have full access to all projects and users in the system.</p>
+                        </div>
+                    </div>
+                )}
+
+                {error && <div className="profile-alert error">{formatError(error)}</div>}
                 {success && <div className="profile-alert success">{success}</div>}
 
                 <div className="profile-body">
@@ -156,6 +189,43 @@ const ProfilePage = () => {
                         </form>
                     ) : (
                         <div className="profile-details">
+                            {!user.is_master_admin && (
+                                <section className="profile-section mode-switch-section">
+                                    <h3>View Mode</h3>
+                                    <p className="mode-description">
+                                        Switch between roles to manage your own projects or view assigned tasks.
+                                    </p>
+                                    <div className="mode-toggle-group">
+                                        <button
+                                            className={`mode-btn ${user.view_mode === 'DEVELOPER' ? 'active' : ''}`}
+                                            onClick={() => handleSwitchMode('DEVELOPER')}
+                                            disabled={switchingMode}
+                                        >
+                                            <div className="mode-btn-content">
+                                                <span className="mode-icon">👨‍💻</span>
+                                                <div className="mode-text">
+                                                    <span className="mode-label">Developer Mode</span>
+                                                    <span className="mode-sublabel">See projects where you're assigned</span>
+                                                </div>
+                                            </div>
+                                        </button>
+                                        <button
+                                            className={`mode-btn ${user.view_mode === 'ADMIN' ? 'active' : ''}`}
+                                            onClick={() => handleSwitchMode('ADMIN')}
+                                            disabled={switchingMode}
+                                        >
+                                            <div className="mode-btn-content">
+                                                <span className="mode-icon">🏗️</span>
+                                                <div className="mode-text">
+                                                    <span className="mode-label">Admin Mode</span>
+                                                    <span className="mode-sublabel">See projects you own/created</span>
+                                                </div>
+                                            </div>
+                                        </button>
+                                    </div>
+                                </section>
+                            )}
+
                             <section className="profile-section">
                                 <h3>Account Information</h3>
                                 <div className="info-grid">
@@ -185,6 +255,13 @@ const ProfilePage = () => {
                     )}
                 </div>
             </div>
+            {showRequestModal && (
+                <ModeSwitchRequestModal
+                    requestedMode={showRequestModal}
+                    onClose={() => setShowRequestModal(null)}
+                    onSuccess={onRequestSuccess}
+                />
+            )}
         </div>
     );
 };
