@@ -1,133 +1,116 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { CheckCircle2, BarChart2, Users, Layout, ArrowRight } from 'lucide-react';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import './LandingPage.css';
-import kietLogo from '../../assets/kiet-logo.png'; // Import the logo
 
 const LandingPage = () => {
     const navigate = useNavigate();
-    const location = useLocation();
-
-    // Scroll to section on mount if hash is present
-    useEffect(() => {
-        if (location.hash) {
-            const element = document.getElementById(location.hash.substring(1));
-            if (element) {
-                element.scrollIntoView({ behavior: 'smooth' });
-            }
-        }
-    }, [location]);
 
     return (
         <div className="landing-container">
-            <div className="landing-bg-glow"></div>
-            <div className="landing-bg-glow-2"></div>
-
             {/* Navbar */}
             <nav className="landing-nav">
-                <div className="landing-logo" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <img src={kietLogo} alt="KIET" style={{ height: '32px' }} />
-                    KIET
+                <div className="landing-logo-container">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path fillRule="evenodd" clipRule="evenodd" d="M11.2 4H4V13.8C4 16.7823 6.41766 19.2 9.4 19.2C10.3941 19.2 11.2 18.3941 11.2 17.4V4ZM19.2 4H12V11.2H19.2V4ZM19.2 12H12V17.4C12 18.3941 12.8059 19.2 13.8 19.2C16.7823 19.2 19.2 16.7823 19.2 13.8V12Z" fill="#0052CC" />
+                    </svg>
+                    <span className="landing-logo-text">Jira</span>
                 </div>
                 <div className="landing-nav-links">
-                    <a className="landing-nav-link" onClick={() => document.getElementById('features').scrollIntoView({ behavior: 'smooth' })}>Features</a>
-                    <a className="landing-nav-link" onClick={() => document.getElementById('about').scrollIntoView({ behavior: 'smooth' })}>About</a>
-                </div>
-                <div className="landing-nav-actions">
-                    <a href="#" className="btn-login" onClick={(e) => { e.preventDefault(); navigate('/login'); }}>Log in</a>
-                    <a href="#" className="btn-get-started" onClick={(e) => { e.preventDefault(); navigate('/signup'); }}>Get Started</a>
+                    <button className="landing-login-btn" onClick={() => navigate("/login")}>Log In</button>
+                    <button className="landing-signup-btn" onClick={() => navigate("/signup")}>Get it free</button>
                 </div>
             </nav>
 
             {/* Hero Section */}
-            <main className="hero-section">
-                <div className="hero-badge">New: Team Insights 2.0 Available Now 🚀</div>
-
-                <h1 className="hero-title">
-                    Manage Projects <br />
-                    <span>The KIET Way</span>
-                </h1>
-
-                <p className="hero-subtitle">
-                    Streamline your workflow, collaborate seamlessly, and ship faster with the most intuitive project management tool built for modern teams.
-                </p>
-
-                <div className="hero-cta-group">
-                    <a href="#" className="btn-hero-primary" onClick={(e) => { e.preventDefault(); navigate('/signup'); }}>Start for free</a>
-                    <a href="#" className="btn-hero-secondary" onClick={(e) => { e.preventDefault(); navigate('/login'); }}>View Demo</a>
+            <header className="landing-hero">
+                <div className="landing-hero-content">
+                    <h1 className="landing-hero-title">Move fast, stay aligned, and build better - together</h1>
+                    <p className="landing-hero-subtitle">
+                        The #1 software development tool used by agile teams. Plan, track, and release world-class software.
+                    </p>
+                    <div className="landing-cta-group">
+                        <button className="landing-cta-primary" onClick={() => navigate("/signup")}>Get it free</button>
+                    </div>
                 </div>
-
-                {/* Floating Elements (Visuals) */}
-                <div className="floating-container">
-                    <div className="floating-card card-1">
-                        <div className="status-dot dot-green"></div>
-                        <div>
-                            <strong>Project Alpha launch</strong>
-                            <div style={{ fontSize: '0.8em', opacity: 0.7 }}>Completed 2 mins ago</div>
+                <div className="landing-hero-image">
+                    {/* Abstract UI Representation */}
+                    <div className="landing-abstract-ui">
+                        <div className="landing-ui-header">
+                            <div className="landing-dot"></div>
+                            <div className="landing-dot"></div>
+                            <div className="landing-dot"></div>
                         </div>
-                    </div>
-
-                    <div className="floating-card card-2">
-                        <div className="status-dot dot-blue"></div>
-                        <div>
-                            <strong>New Team Member</strong>
-                            <div style={{ fontSize: '0.8em', opacity: 0.7 }}>Alex joined Design Team</div>
-                        </div>
-                    </div>
-
-                    <div className="floating-card card-3">
-                        <div className="status-dot dot-purple"></div>
-                        <div>
-                            <strong>Sprint Planning</strong>
-                            <div style={{ fontSize: '0.8em', opacity: 0.7 }}>In Progress • 45% Done</div>
-                        </div>
-                    </div>
-                    <div className="floating-card card-4">
-                        <div className="status-dot dot-orange"></div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <Users size={16} />
-                            <span>Team Velocity +20%</span>
+                        <div className="landing-ui-body">
+                            <div className="landing-ui-sidebar"></div>
+                            <div className="landing-ui-content">
+                                <div className="landing-ui-row"></div>
+                                <div className="landing-ui-row"></div>
+                                <div className="landing-ui-card"></div>
+                                <div className="landing-ui-card"></div>
+                                <div className="landing-ui-card landing-ui-card-yellow"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </main>
+            </header>
+
+            {/* Trusted By Section */}
+            <section className="landing-trusted-section">
+                <p className="landing-trusted-title">TRUSTED BY 100,000+ TEAMS</p>
+                <div className="landing-logo-grid">
+                    <div className="landing-company-logo">SQUARE</div>
+                    <div className="landing-company-logo">EBAY</div>
+                    <div className="landing-company-logo">SPOTIFY</div>
+                    <div className="landing-company-logo">CISCO</div>
+                    <div className="landing-company-logo">AIRBNB</div>
+                </div>
+            </section>
 
             {/* Features Section */}
-            <section id="features" style={{ padding: '6rem 2rem', textAlign: 'center', position: 'relative', zIndex: 10 }}>
-                <h2 style={{ fontSize: '2.5rem', marginBottom: '3rem', fontWeight: 700 }}>Features that empower teams</h2>
-                <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', flexWrap: 'wrap', maxWidth: '1200px', margin: '0 auto' }}>
-                    <div style={{ background: 'rgba(255,255,255,0.05)', padding: '2rem', borderRadius: '16px', width: '300px', border: '1px solid rgba(255,255,255,0.1)' }}>
-                        <Layout size={40} color="#6366f1" style={{ marginBottom: '1rem' }} />
-                        <h3 style={{ fontSize: '1.25rem', marginBottom: '1rem' }}>Scrum & Kanban</h3>
-                        <p style={{ color: '#94a3b8', lineHeight: 1.6 }}>Visualize work with flexible boards. Customize workflow to match your team's style.</p>
+            <section className="landing-features-section">
+                <h2 className="landing-features-header">All the features you need</h2>
+                <div className="landing-cards-grid">
+                    <div className="landing-feature-card">
+                        <div className="landing-icon-container">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" stroke="#0052cc" strokeWidth="2" /><path d="M9 3V21" stroke="#0052cc" strokeWidth="2" /></svg>
+                        </div>
+                        <h3 className="landing-card-title">Plan</h3>
+                        <p className="landing-card-text">Create user stories and issues, plan sprints, and distribute tasks across your software team.</p>
                     </div>
-                    <div style={{ background: 'rgba(255,255,255,0.05)', padding: '2rem', borderRadius: '16px', width: '300px', border: '1px solid rgba(255,255,255,0.1)' }}>
-                        <BarChart2 size={40} color="#22d3ee" style={{ marginBottom: '1rem' }} />
-                        <h3 style={{ fontSize: '1.25rem', marginBottom: '1rem' }}>Real-time Reporting</h3>
-                        <p style={{ color: '#94a3b8', lineHeight: 1.6 }}>Gain actionable insights into team performance with velocity charts and sprint reports.</p>
+                    <div className="landing-feature-card">
+                        <div className="landing-icon-container">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none"><path d="M4 12H20" stroke="#0052cc" strokeWidth="2" /><path d="M15 7L20 12L15 17" stroke="#0052cc" strokeWidth="2" /></svg>
+                        </div>
+                        <h3 className="landing-card-title">Track </h3>
+                        <p className="landing-card-text">Prioritize and discuss your team’s work in full context with complete visibility.</p>
                     </div>
-                    <div style={{ background: 'rgba(255,255,255,0.05)', padding: '2rem', borderRadius: '16px', width: '300px', border: '1px solid rgba(255,255,255,0.1)' }}>
-                        <Users size={40} color="#f472b6" style={{ marginBottom: '1rem' }} />
-                        <h3 style={{ fontSize: '1.25rem', marginBottom: '1rem' }}>Team Collaboration</h3>
-                        <p style={{ color: '#94a3b8', lineHeight: 1.6 }}>Stay aligned with mentions, comments, and real-time notifications on every issue.</p>
+                    <div className="landing-feature-card">
+                        <div className="landing-icon-container">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none"><path d="M18 20V10" stroke="#0052cc" strokeWidth="2" /><path d="M12 20V4" stroke="#0052cc" strokeWidth="2" /><path d="M6 20V14" stroke="#0052cc" strokeWidth="2" /></svg>
+                        </div>
+                        <h3 className="landing-card-title">Report</h3>
+                        <p className="landing-card-text">Improve team performance based on real-time, visual data that your team can put to use.</p>
                     </div>
                 </div>
             </section>
 
-            {/* About Section */}
-            <section id="about" style={{ padding: '6rem 2rem', textAlign: 'center', position: 'relative', zIndex: 10, background: 'rgba(0,0,0,0.2)' }}>
-                <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-                    <h2 style={{ fontSize: '2.5rem', marginBottom: '1.5rem', fontWeight: 700 }}>About KIET</h2>
-                    <p style={{ fontSize: '1.1rem', color: '#cbd5e1', lineHeight: 1.8 }}>
-                        KIET is designed to bring clarity to chaos. Whether you are a startup or an enterprise,
-                        our mission is to provide a seamless, powerful, and beautiful workspace where ideas turn into reality.
-                        Built with modern teams in mind, KIET combines speed, aesthetics, and functionality.
-                    </p>
+            {/* Footer */}
+            <footer className="landing-footer">
+                <div className="landing-footer-content">
+                    <div className="landing-footer-logo">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path fillRule="evenodd" clipRule="evenodd" d="M11.2 4H4V13.8C4 16.7823 6.41766 19.2 9.4 19.2C10.3941 19.2 11.2 18.3941 11.2 17.4V4ZM19.2 4H12V11.2H19.2V4ZM19.2 12H12V17.4C12 18.3941 12.8059 19.2 13.8 19.2C16.7823 19.2 19.2 16.7823 19.2 13.8V12Z" fill="#0052CC" />
+                        </svg>
+                        <span className="landing-footer-logo-text">Jira</span>
+                    </div>
+                    <div className="landing-copyright">
+                        © 2026 Jira Copy. All rights reserved.
+                    </div>
                 </div>
-            </section>
-
+            </footer>
         </div>
     );
 };
 
 export default LandingPage;
+
