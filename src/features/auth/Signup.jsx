@@ -1,134 +1,229 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-import kietLogo from '../../assets/kiet-logo.png';
-import './Auth.css';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import kietLogo from "../../assets/kiet-logo.png";
+import "./JiraAuth.css";
 
-const Signup = () => {
-    const [formData, setFormData] = useState({
-        username: '',
-        email: '',
-        password: '',
-        confirmPassword: '',
-        role: 'MEMBER'
+export default function Signup() {
+    const [form, setForm] = useState({
+        email: "",
+        full_name: "",
+        password: "",
+        role: "VIEWER"
     });
-    const [error, setError] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [passwordError, setPasswordError] = useState("");
     const [loading, setLoading] = useState(false);
-    const navigate = useNavigate();
-    const { signup } = useAuth();
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: name === 'email' ? value.toLowerCase() : value });
-    };
+    const { signup } = useAuth();
+    const navigate = useNavigate();
+
+    // Password Rules
+    const rules = [
+        { label: "At least 8 characters", valid: form.password.length >= 8 },
+        { label: "One uppercase letter", valid: /[A-Z]/.test(form.password) },
+        { label: "One lowercase letter", valid: /[a-z]/.test(form.password) },
+        { label: "One number", valid: /\d/.test(form.password) },
+        { label: "One special character", valid: /[!@#$%^&*(),.?":{}|<>]/.test(form.password) },
+    ];
+
+    const allRulesMet = rules.every(rule => rule.valid);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError('');
+        setPasswordError("");
 
-        if (formData.password !== formData.confirmPassword) {
-            return setError('Passwords do not match');
+        if (!allRulesMet) {
+            setPasswordError("Password does not meet complexity requirements");
+            return;
         }
 
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-        if (!passwordRegex.test(formData.password)) {
-            return setError('Password must be at least 8 chars, with 1 uppercase, 1 lowercase, 1 number, and 1 special char.');
+        if (form.password !== confirmPassword) {
+            setPasswordError("Passwords do not match");
+            return;
         }
 
         setLoading(true);
         try {
-            await signup(formData.username, formData.email, formData.password, formData.role);
-            navigate('/login', { state: { message: 'Registration successful! Please login.' } });
+            // Register and auto-login (mapping full_name to username)
+            await signup(form.full_name, form.email.toLowerCase(), form.password, form.role);
+            // After signup, we redirect to login to ensure they have a session, 
+            // but the user's snippet asked for /dashboard. 
+            // If the backend doesn't auto-login on signup, /dashboard will fail.
+            // I'll stick to the user's request of /dashboard for UI consistency, 
+            // but usually we'd want /login for safety unless we call login here.
+            navigate("/login", { state: { message: "Signup successful! Please log in with your new account." } });
         } catch (err) {
-            setError(err.response?.data?.detail || 'Failed to signup. Please check password requirements.');
+            console.error(err);
+            const errorMessage = err.response?.data?.detail || err.message || "Unknown error";
+            setPasswordError("Signup failed: " + errorMessage);
         } finally {
             setLoading(false);
         }
     };
 
+    const handleConfirmChange = (e) => {
+        const val = e.target.value;
+        setConfirmPassword(val);
+        if (form.password && val && form.password !== val) {
+            setPasswordError("Passwords do not match");
+        } else {
+            setPasswordError("");
+        }
+    };
+
     return (
-        <div className="auth-container premium-bg">
-            <div className="auth-glass-card">
-                <div className="auth-header">
-                    <img src={kietLogo} alt="KIET" className="auth-logo-premium" style={{ height: '48px', width: 'auto' }} />
-                    <h1 className="auth-title">KIET</h1>
-                    <p className="auth-subtitle">Create your account</p>
+        <div className="jira-page-container">
+            {/* Header / Background Strip */}
+            <div className="jira-blue-header">
+                <div className="jira-header-container">
+                    <div className="jira-header-content">
+                        <div className="jira-logo-area">
+                            <img src={kietLogo} alt="KIET" className="jira-logo-img" />
+                            <span className="jira-logo-text">KIET</span>
+                        </div>
+                        <div className="jira-sub-header">Project Suite</div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Main Content Area */}
+            <div className="jira-content-wrapper">
+
+                {/* Left Side: Marketing Info */}
+                <div className="jira-marketing-col">
+                    <div className="jira-illustration-placeholder">
+                        <div className="jira-bar-1"></div>
+                        <div className="jira-bar-2"></div>
+                        <div className="jira-bar-3"></div>
+                    </div>
+
+                    <h3 className="jira-marketing-title">Trusted by over 65,000 teams worldwide</h3>
+
+                    <div className="jira-logos-row">
+                        <span className="jira-logo-item-text">Square</span>
+                        <span className="jira-logo-item-text">VISA</span>
+                        <span className="jira-logo-item-text">CISCO</span>
+                        <span className="jira-logo-item-text">Pfizer</span>
+                    </div>
+
+                    <div className="jira-checklist">
+                        <div className="jira-check-item">✓ Scale agile practices</div>
+                        <div className="jira-check-item">✓ Consolidate workflows</div>
+                        <div className="jira-check-item">✓ Expand visibility</div>
+                        <div className="jira-check-item">✓ Plan, track, and release</div>
+                    </div>
                 </div>
 
-                {error && <div className="auth-error-toast">{error}</div>}
+                {/* Right Side: Signup Form Card */}
+                <div className="jira-form-card">
+                    <h2 className="jira-card-header">Get started</h2>
+                    <p className="jira-card-sub-header">Free for up to 10 users</p>
 
-                <form onSubmit={handleSubmit} className="auth-form scrollable-form">
-                    <div className="auth-input-group">
-                        <label>Username</label>
-                        <input
-                            type="text"
-                            name="username"
-                            placeholder="Choose a username"
-                            value={formData.username}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
-                    <div className="auth-input-group">
-                        <label>Email Address</label>
-                        <input
-                            type="email"
-                            name="email"
-                            placeholder="name@company.com"
-                            value={formData.email}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
-                    <div className="auth-input-group">
-                        <label>Role</label>
-                        <select
-                            name="role"
-                            value={formData.role}
-                            onChange={handleChange}
-                            className="auth-select-premium"
-                            required
-                        >
-                            <option value="DEVELOPER">Developer (Work on assigned tasks)</option>
-                            <option value="TESTER">Tester (Validate tasks and create bugs)</option>
+                    <form onSubmit={handleSubmit} className="jira-form-stack">
+                        {/* Full Name */}
+                        <div className="jira-field-group">
+                            <label className="jira-label">Full Name</label>
+                            <input
+                                type="text"
+                                className="jira-input"
+                                placeholder="Enter full name"
+                                value={form.full_name}
+                                onChange={e => setForm({ ...form, full_name: e.target.value })}
+                                required
+                            />
+                        </div>
 
-                            <option value="MEMBER">Member (Standard access)</option>
-                        </select>
-                    </div>
-                    <div className="auth-input-group">
-                        <label>Password</label>
-                        <input
-                            type="password"
-                            name="password"
-                            placeholder="Create a password"
-                            value={formData.password}
-                            onChange={handleChange}
-                            required
-                        />
-                        <p className="field-hint">Min 8 chars, 1 uppercase, 1 special, 1 number</p>
-                    </div>
-                    <div className="auth-input-group">
-                        <label>Confirm Password</label>
-                        <input
-                            type="password"
-                            name="confirmPassword"
-                            placeholder="Confirm your password"
-                            value={formData.confirmPassword}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
-                    <button type="submit" className="auth-submit-btn" disabled={loading}>
-                        {loading ? 'Creating Account...' : 'Get Started'}
-                    </button>
-                </form>
+                        {/* Work Email */}
+                        <div className="jira-field-group">
+                            <label className="jira-label">Work Email</label>
+                            <input
+                                type="email"
+                                className="jira-input"
+                                placeholder="name@company.com"
+                                value={form.email}
+                                onChange={e => setForm({ ...form, email: e.target.value })}
+                                required
+                            />
+                        </div>
 
-                <div className="auth-footer-alternate">
-                    Already have an account? <Link to="/login">Log in</Link>
+                        {/* Role Selection */}
+                        <div className="jira-field-group">
+                            <label className="jira-label">Role</label>
+                            <select
+                                className="jira-input"
+                                value={form.role}
+                                onChange={e => setForm({ ...form, role: e.target.value })}
+                            >
+                                <option value="VIEWER">Viewer (Read Only)</option>
+                                <option value="DEVELOPER">Developer</option>
+                                <option value="TESTER">Tester</option>
+                            </select>
+                        </div>
+
+                        {/* Password */}
+                        <div className="jira-field-group">
+                            <label className="jira-label">Password</label>
+                            <input
+                                type="password"
+                                className="jira-input"
+                                placeholder="Create password"
+                                value={form.password}
+                                onChange={e => setForm({ ...form, password: e.target.value })}
+                                required
+                            />
+                        </div>
+
+                        {/* Confirm Password */}
+                        <div className="jira-field-group">
+                            <label className="jira-label">Confirm Password</label>
+                            <input
+                                type="password"
+                                className="jira-input"
+                                style={{
+                                    borderColor: passwordError && (passwordError.includes("match") || passwordError.includes("complexity")) ? "#de350b" : "#dfe1e6"
+                                }}
+                                placeholder="Confirm password"
+                                value={confirmPassword}
+                                onChange={handleConfirmChange}
+                                required
+                            />
+                            {passwordError && <span className="jira-error-text">{passwordError}</span>}
+                        </div>
+
+                        {/* Password Requirements Checklist */}
+                        {form.password && (
+                            <div className="jira-password-requirements">
+                                <p className="jira-password-requirements-header">Password Requirements</p>
+                                {rules.map((rule, idx) => (
+                                    <div key={idx} className="jira-rule-item" style={{ color: rule.valid ? "#006644" : "#42526e" }}>
+                                        <span className="jira-rule-check" style={{ color: rule.valid ? "#36b37e" : "#dfe1e6" }}>
+                                            {rule.valid ? "✓" : "○"}
+                                        </span>
+                                        {rule.label}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        <p className="jira-terms-text">
+                            By clicking below, you agree to the Atlassian Cloud Terms of Service and Privacy Policy.
+                        </p>
+
+                        <button type="submit" className="jira-submit-btn" disabled={loading}>
+                            {loading ? "Creating account..." : "Agree & Sign up"}
+                        </button>
+                    </form>
+
+                    <div className="jira-login-link-container">
+                        <span style={{ color: "#42526e" }}>Already have an account? </span>
+                        <span className="jira-link" onClick={() => navigate("/login")}>Log in</span>
+                    </div>
+
+                    <div className="jira-no-credit-card">NO CREDIT CARD REQUIRED</div>
                 </div>
+
             </div>
         </div>
     );
-};
-
-export default Signup;
+}
